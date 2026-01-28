@@ -1,0 +1,125 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions for data validation
+    function isValidCanineBloodType(bloodType) {
+      return bloodType in [
+        "dea1.1", 
+        "dea1.2", 
+        "dea3", 
+        "dea4", 
+        "dea5", 
+        "dea7", 
+        "universal", 
+        "unknown"
+      ];
+    }
+    
+    function isValidDogAge(age) {
+      return age >= 1 && age <= 8;
+    }
+    
+    function isValidDogWeight(weight) {
+      return weight >= 20;
+    }
+    
+    function isValidEmail(email) {
+      return email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+    
+    function isValidPhone(phone) {
+      return phone.matches('^[+]?[0-9]{10,15}$');
+    }
+
+    // Users collection - central user management
+    match /users/{userId} {
+      // Temporarily allow all access for development
+      allow read, write, create, list: if true;
+      
+      // Production rules (commented out for now)
+      // allow read, write: if request.auth != null && request.auth.uid == userId;
+      // allow create: if request.auth != null 
+      //   && request.auth.uid == userId
+      //   && resource.data.role in ["patient", "donor", "veterinary", "organisation"]
+      //   && resource.data.onboarded in ["yes", "no"];
+      // // Allow read access for login process (query by phone/email)
+      // allow list: if request.auth != null;
+    }
+
+    // Canines collection (formerly donors)
+    match /canines/{canineId} {
+      allow read, write: if true;
+      allow create: if true 
+        && isValidEmail(resource.data.email)
+        && isValidPhone(resource.data.phone)
+        && isValidCanineBloodType(resource.data.d_bloodgroup)
+        && resource.data.d_name is string
+        && resource.data.d_name.size() > 0
+        && resource.data.d_gender in ["male", "female"]
+        && isValidDogWeight(resource.data.d_weight_kg);
+    }
+
+    // Patients collection rules  
+    match /patients/{patientId} {
+      allow read, write: if true;
+      allow create: if true
+        && isValidEmail(resource.data.email)
+        && isValidPhone(resource.data.phone)
+        && isValidCanineBloodType(resource.data.p_bloodgroup)
+        && resource.data.p_name is string
+        && resource.data.p_name.size() > 0;
+    }
+
+    // Clinics collection (formerly hospitals/veterinaries)
+    match /clinics/{clinicId} {
+      allow read, write: if true;
+      allow create: if true
+        && isValidEmail(resource.data.email)
+        && resource.data.h_name is string
+        && resource.data.h_name.size() > 0
+        && resource.data.h_phone is string
+        && resource.data.h_phone.size() > 0;
+    }
+
+    // Organisations collection rules
+    match /organisations/{organisationId} {
+      allow read, write: if true;
+      allow create: if true
+        && isValidEmail(resource.data.email)
+        && resource.data.o_name is string
+        && resource.data.o_name.size() > 0;
+    }
+
+    // Blood requests collection rules
+    match /bloodRequests/{requestId} {
+      allow read, write: if true;
+      allow create: if true
+        && isValidCanineBloodType(resource.data.required_blood_type)
+        && resource.data.requester_id is string
+        && resource.data.requester_id.size() > 0
+        && resource.data.urgency in ["low", "medium", "high", "critical"]
+        && resource.data.quantity is number
+        && resource.data.quantity > 0;
+    }
+
+    // Donation records collection rules
+    match /donationRecords/{recordId} {
+      allow read, write: if true;
+      allow create: if true
+        && resource.data.donor_id is string
+        && resource.data.donor_id.size() > 0
+        && resource.data.recipient_id is string
+        && resource.data.recipient_id.size() > 0
+        && resource.data.donation_date is timestamp
+        && resource.data.blood_type is string
+        && isValidCanineBloodType(resource.data.blood_type)
+        && resource.data.volume_ml is number
+        && resource.data.volume_ml > 0;
+    }
+
+    // Deny all other reads/writes
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
