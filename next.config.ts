@@ -14,8 +14,16 @@ const nextConfig = {
   experimental: {
     // serverActions is enabled by default // Ensure APIs work properly in App Router
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/login',
+        permanent: false, // false = 307 temporary redirect
+      },
+    ];
+  },
 };
 
-module.exports = nextConfig;
 
 export default nextConfig;

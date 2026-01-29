@@ -10,8 +10,8 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "DonorSync ✦ Blood Donation Platform",
-  description: "A comprehensive web-based platform that connects blood donors directly with hospitals, ensuring quick and efficient blood donation.",
+  title: "K9Hope - Login",
+  description: "India's first AI-powered canine blood donation network",
 };
 
 // Component to update device type
