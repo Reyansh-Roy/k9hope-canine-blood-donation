@@ -1,8 +1,10 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
-import { getDonorAppointments } from "@/firebaseFunctions";
+import { db } from "@/firebaseConfig";
+import { collection, query, where, orderBy, getDocs, doc, updateDoc, Timestamp, getDoc } from "firebase/firestore";
 import { Calendar, MapPin, Clock, Phone, CheckCircle, AlertTriangle, XCircle, Download } from "lucide-react";
 import HeartLoading from "@/components/custom/HeartLoading";
 import Link from "next/link";
@@ -22,21 +24,76 @@ export default function AppointmentsPage() {
       return;
     }
 
-    async function fetchAppointments() {
-      setIsLoading(true);
-      try {
-        const appointmentsData = await getDonorAppointments(userId);
-        setAppointments(appointmentsData);
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
-        setAppointments([]);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     fetchAppointments();
   }, [userId, role, router]);
+
+  async function fetchAppointments() {
+    setIsLoading(true);
+    try {
+      // Query donor-appointments collection
+      const appointmentsRef = collection(db, "donor-appointments");
+      const q = query(
+        appointmentsRef,
+        where("donorId", "==", userId),
+        orderBy("createdAt", "desc")
+      );
+
+      const snapshot = await getDocs(q);
+      const appointmentsData = await Promise.all(snapshot.docs.map(async (docSnap) => {
+        const data = docSnap.data();
+        let hospitalName = data.clinicName || "Veterinary Clinic";
+        let city = "Unknown City";
+        let contactPhone = "";
+
+        // If clinicId exists, fetch more details from hospitals collection if needed
+        // (Though typically we store snapshot of name/city in appointment for performance)
+        if (data.clinicId && !data.clinicName) {
+          const clinicRef = doc(db, "hospitals", data.clinicId);
+          const clinicSnap = await getDoc(clinicRef);
+          if (clinicSnap.exists()) {
+            const clinicData = clinicSnap.data();
+            hospitalName = clinicData.h_name;
+            city = clinicData.h_city;
+            contactPhone = clinicData.phone;
+          }
+        }
+
+        return {
+          id: docSnap.id,
+          ...data,
+          hospitalName,
+          city: city || data.clinicCity, // Fallback if stored in appointment
+          contactPhone: contactPhone || data.clinicPhone
+        };
+      }));
+
+      setAppointments(appointmentsData);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      setAppointments([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleCancelAppointment(appointmentId: string) {
+    if (!confirm("Are you sure you want to cancel this appointment?")) return;
+
+    try {
+      const appointmentRef = doc(db, "donor-appointments", appointmentId);
+      await updateDoc(appointmentRef, {
+        status: "cancelled",
+        cancelledAt: Timestamp.now(),
+        cancelledBy: "donor"
+      });
+
+      alert("✅ Appointment cancelled successfully");
+      fetchAppointments(); // Refresh list
+    } catch (error) {
+      console.error("Error cancelling appointment:", error);
+      alert("❌ Failed to cancel appointment. Please contact the clinic directly.");
+    }
+  }
 
   if (isLoading) {
     return (
@@ -48,12 +105,23 @@ export default function AppointmentsPage() {
 
   const now = new Date();
   const filteredAppointments = appointments.filter(apt => {
-    const aptDate = apt.appointmentDate?.toDate ? apt.appointmentDate.toDate() : new Date(apt.appointmentDate);
+    // Handle Firestore Timestamp or Date string
+    let aptDate = new Date();
+    if (apt.appointmentDate) {
+      if (typeof apt.appointmentDate === 'string') {
+        aptDate = new Date(apt.appointmentDate);
+      } else if (apt.appointmentDate.toDate) {
+        aptDate = apt.appointmentDate.toDate();
+      }
+    }
 
     if (filterStatus === "upcoming") {
-      return aptDate >= now && apt.status !== "completed" && apt.status !== "cancelled";
+      // Include pending and confirmed, exclude completed/cancelled, date must be future or today
+      // actually, let's just show all non-completed/non-cancelled as upcoming regardless of date? 
+      // Or strictly future dates? Let's stick to status primarily.
+      return (apt.status === "pending" || apt.status === "confirmed") && apt.status !== "cancelled";
     } else if (filterStatus === "past") {
-      return aptDate < now || apt.status === "completed";
+      return apt.status === "completed" || (aptDate < now && apt.status !== "cancelled" && apt.status !== "pending" && apt.status !== "confirmed");
     } else if (filterStatus === "cancelled") {
       return apt.status === "cancelled";
     }
@@ -90,20 +158,17 @@ export default function AppointmentsPage() {
               <button
                 onClick={() => setFilterStatus("upcoming")}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all whitespace-nowrap ${filterStatus === "upcoming"
-                    ? "bg-purple-500 text-white shadow-md active:scale-95"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-purple-500 text-white shadow-md active:scale-95"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
               >
-                Upcoming ({appointments.filter(a => {
-                  const d = a.appointmentDate?.toDate ? a.appointmentDate.toDate() : new Date(a.appointmentDate);
-                  return d >= now && a.status !== "completed" && a.status !== "cancelled";
-                }).length})
+                Upcoming
               </button>
               <button
                 onClick={() => setFilterStatus("past")}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all whitespace-nowrap ${filterStatus === "past"
-                    ? "bg-purple-500 text-white shadow-md active:scale-95"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-purple-500 text-white shadow-md active:scale-95"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
               >
                 Past
@@ -111,8 +176,8 @@ export default function AppointmentsPage() {
               <button
                 onClick={() => setFilterStatus("cancelled")}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all whitespace-nowrap ${filterStatus === "cancelled"
-                    ? "bg-purple-500 text-white shadow-md active:scale-95"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-purple-500 text-white shadow-md active:scale-95"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
               >
                 Cancelled
@@ -126,7 +191,11 @@ export default function AppointmentsPage() {
           {filteredAppointments.length > 0 ? (
             <div className="space-y-6 mb-8">
               {filteredAppointments.map((appointment) => (
-                <AppointmentItem key={appointment.id} appointment={appointment} />
+                <AppointmentItem
+                  key={appointment.id}
+                  appointment={appointment}
+                  onCancel={() => handleCancelAppointment(appointment.id)}
+                />
               ))}
             </div>
           ) : (
@@ -155,10 +224,15 @@ export default function AppointmentsPage() {
   );
 }
 
-function AppointmentItem({ appointment }: any) {
-  const appointmentDate = appointment.appointmentDate?.toDate
-    ? appointment.appointmentDate.toDate()
-    : new Date(appointment.appointmentDate);
+function AppointmentItem({ appointment, onCancel }: any) {
+  let appointmentDate = new Date();
+  if (appointment.appointmentDate) {
+    if (typeof appointment.appointmentDate === 'string') {
+      appointmentDate = new Date(appointment.appointmentDate);
+    } else if (appointment.appointmentDate.toDate) {
+      appointmentDate = appointment.appointmentDate.toDate();
+    }
+  }
 
   const statusConfig: Record<string, any> = {
     confirmed: {
@@ -199,8 +273,12 @@ function AppointmentItem({ appointment }: any) {
             <h3 className="text-xl font-bold text-gray-900 mb-1">
               {appointment.hospitalName || "Hospital Appointment"}
             </h3>
-            {appointment.patientName && (
-              <p className="text-gray-600 font-medium">For: {appointment.patientName}</p>
+            {appointment.linkedPatientName && (
+              <p className="text-gray-600 font-medium">For: {appointment.linkedPatientName}</p>
+            )}
+            {/* Show admin notes if any */}
+            {appointment.adminNotes && (
+              <p className="text-sm text-gray-500 mt-1 italic">Note: {appointment.adminNotes}</p>
             )}
           </div>
           <div className={`${status.bgLight} ${status.color} px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm shrink-0`}>
@@ -242,7 +320,7 @@ function AppointmentItem({ appointment }: any) {
               <p className="text-sm font-semibold text-gray-600">Location</p>
             </div>
             <p className="text-sm font-bold text-gray-900 line-clamp-1">
-              {appointment.city || "Not specified"}
+              {appointment.clinicCity || appointment.city || "Not specified"}
             </p>
           </div>
         </div>
@@ -267,15 +345,26 @@ function AppointmentItem({ appointment }: any) {
                 <Download className="w-4 h-4" />
                 Add to Calendar
               </button>
-              <button className="px-6 border-2 border-gray-200 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-600 py-3 rounded-lg font-semibold transition-all active:scale-[0.98]">
-                Request Cancellation
+              <button
+                onClick={onCancel}
+                className="px-6 border-2 border-gray-200 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-600 py-3 rounded-lg font-semibold transition-all active:scale-[0.98]"
+              >
+                Cancel Appointment
               </button>
             </>
           )}
           {appointment.status === "pending" && (
-            <div className="flex-1 bg-yellow-100 text-yellow-800 py-3 rounded-lg font-bold text-center border border-yellow-200">
-              Awaiting Hospital Confirmation
-            </div>
+            <>
+              <div className="flex-1 bg-yellow-100 text-yellow-800 py-3 rounded-lg font-bold text-center border border-yellow-200">
+                Awaiting Hospital Confirmation
+              </div>
+              <button
+                onClick={onCancel}
+                className="px-6 border-2 border-gray-200 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-600 py-3 rounded-lg font-semibold transition-all active:scale-[0.98]"
+              >
+                Cancel Request
+              </button>
+            </>
           )}
           {appointment.status === "completed" && (
             <div className="flex-1 bg-green-100 text-green-800 py-3 rounded-lg font-bold text-center border border-green-200">

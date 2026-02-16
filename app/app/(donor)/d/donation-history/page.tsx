@@ -1,11 +1,14 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
-import { getDonorHistory, getDonorStats } from "@/firebaseFunctions";
+import { db } from "@/firebaseConfig";
+import { collection, query, where, orderBy, getDocs, doc, getDoc } from "firebase/firestore";
 import { Award, Droplet, Heart, TrendingUp, Download, Calendar, MapPin, Star } from "lucide-react";
 import HeartLoading from "@/components/custom/HeartLoading";
 import Link from "next/link";
+import { format } from "date-fns";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 
 export default function DonationHistoryPage() {
@@ -25,11 +28,10 @@ export default function DonationHistoryPage() {
     async function fetchData() {
       setIsLoading(true);
       try {
-        const history = await getDonorHistory(userId);
-        const donorStats = await getDonorStats(userId);
-
-        setDonations(history);
-        setStats(donorStats);
+        await Promise.all([
+          fetchDonationHistory(),
+          calculateStats()
+        ]);
       } catch (error) {
         console.error("Error fetching donation history:", error);
       } finally {
@@ -39,6 +41,78 @@ export default function DonationHistoryPage() {
 
     fetchData();
   }, [userId, role, router]);
+
+  async function fetchDonationHistory() {
+    // Get completed appointments from admin's system
+    const appointmentsRef = collection(db, "donor-appointments");
+    const q = query(
+      appointmentsRef,
+      where("donorId", "==", userId),
+      where("status", "==", "completed"),
+      orderBy("appointmentDate", "desc") // Use appointmentDate or completedAt if available
+    );
+
+    const snapshot = await getDocs(q);
+    const history = [];
+
+    for (const docSnap of snapshot.docs) {
+      const data = docSnap.data();
+
+      // Fetch clinic details
+      let hospitalName = data.clinicName || "Veterinary Clinic";
+      let city = data.clinicCity || "Unknown City";
+
+      if (data.clinicId && !data.clinicName) {
+        const clinicRef = doc(db, "hospitals", data.clinicId);
+        const clinicSnap = await getDoc(clinicRef);
+        if (clinicSnap.exists()) {
+          const clinicData = clinicSnap.data();
+          hospitalName = clinicData.h_name;
+          city = clinicData.h_city;
+        }
+      }
+
+      history.push({
+        id: docSnap.id,
+        donationDate: data.appointmentDate, // or completedAt
+        bloodType: data.dogBloodType,
+        quantityDonated: data.quantityDonated || "450ml",
+        hospital: hospitalName,
+        city: city,
+        patientName: data.linkedPatientName,
+        notes: data.notes,
+      });
+    }
+
+    setDonations(history);
+  }
+
+  async function calculateStats() {
+    // Query donor profile for total count
+    const donorRef = doc(db, "donors", userId);
+    const donorSnap = await getDoc(donorRef);
+    const donorData = donorSnap.data();
+
+    // d_donationCount is maintained by the admin side trigger or manual update
+    const totalDonations = donorData?.d_donationCount || 0;
+
+    // Formatting last donation date
+    let lastDonation = "Never";
+    if (donorData?.d_lastDonation) {
+      lastDonation = format(new Date(donorData.d_lastDonation), "PPP");
+    }
+
+    setStats({
+      totalDonations,
+      livesSaved: totalDonations * 3,
+      lastDonation,
+    });
+  }
+
+  async function handleDownloadCertificate(donationId: string) {
+    // Generate PDF certificate with donation details
+    alert("Certificate download feature coming soon!");
+  }
 
   if (isLoading) {
     return (
@@ -122,8 +196,8 @@ export default function DonationHistoryPage() {
                 <div
                   key={idx}
                   className={`p-4 rounded-xl text-center transition-all border-2 ${achievement.earned
-                      ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-400 shadow-sm'
-                      : 'bg-gray-50 border-gray-100 grayscale opacity-40'
+                    ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-400 shadow-sm'
+                    : 'bg-gray-50 border-gray-100 grayscale opacity-40'
                     }`}
                 >
                   <div className="text-4xl mb-2 drop-shadow-sm">{achievement.icon}</div>
@@ -145,7 +219,7 @@ export default function DonationHistoryPage() {
           {donations.length > 0 ? (
             <div className="space-y-6">
               {donations.map((donation) => (
-                <DonationItem key={donation.id} donation={donation} />
+                <DonationItem key={donation.id} donation={donation} onDownload={handleDownloadCertificate} />
               ))}
             </div>
           ) : (
@@ -170,10 +244,16 @@ export default function DonationHistoryPage() {
   );
 }
 
-function DonationItem({ donation }: any) {
-  const donationDate = donation.donationDate?.toDate
-    ? donation.donationDate.toDate()
-    : new Date(donation.donationDate);
+function DonationItem({ donation, onDownload }: any) {
+  // Handle Firestore date object or string
+  let donationDate = new Date();
+  if (donation.donationDate) {
+    if (typeof donation.donationDate === 'string') {
+      donationDate = new Date(donation.donationDate);
+    } else if (donation.donationDate.toDate) {
+      donationDate = donation.donationDate.toDate();
+    }
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all border-l-4 border-red-500 overflow-hidden">
@@ -235,7 +315,10 @@ function DonationItem({ donation }: any) {
         )}
 
         <div className="flex gap-3 mt-6">
-          <button className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-bold shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+          <button
+            onClick={() => onDownload(donation.id)}
+            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-bold shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+          >
             <Download className="w-4 h-4" />
             Download Certificate
           </button>
