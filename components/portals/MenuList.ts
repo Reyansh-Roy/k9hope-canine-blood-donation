@@ -5,7 +5,8 @@ import {
   History, SquareUserRound, MessageCircleReply, CalendarCheck, BotMessageSquare,
   LayoutGrid, Syringe, PersonStanding,
   LucideIcon, Tent, HandCoins,
-  AlertCircle, Bot, MessageSquare
+  AlertCircle, Bot, MessageSquare,
+  UserCheck, Droplet, BarChart3, User
 } from "lucide-react";
 
 type Submenu = {
@@ -147,149 +148,31 @@ export function getMenuList(pathname: string, role: "guest" | "admin" | "removed
             href: "/app/h/blood-requests",
             label: "Blood Requests",
             icon: HeartPulse,
-            submenus: [/* 
-              {
-                href: "/donate/urgent",
-                label: "Incoming Patients Requests"
-              },
-              {
-                href: "/donate/nearby",
-                label: "Request Processing & Status Updates",
-
-              },
-              {
-                href: "/donate/nearby",
-                label: "Urgent/Emergency Requests",
-
-              }
-             */]
+            submenus: []
           },
           {
             href: "/app/h/patient-management",
             label: "Pet Patient Management",
-            icon: UserSearch,
-            submenus: [/* 
-              {
-                href: "/donate/urgent",
-                label: "List of admitted patients"
-              },
-              {
-                href: "/donate/nearby",
-                label: "Blood transfusion schedules",
-
-              },
-              {
-                href: "/donate/nearby",
-                label: "Medical reports & case history",
-              } */
-            ]
+            icon: Users,
+            submenus: []
           },
           {
             href: "/app/h/blood-inventory",
             label: "Blood Inventory",
-            icon: Syringe,
-            submenus: [
-              /* {
-                href: "/donate/urgent",
-                label: "Available blood types & stock levels"
-              },
-              {
-                href: "/donate/nearby",
-                label: "Expiry alerts & low-stock warnings",
-
-              },
-              {
-                href: "/donate/nearby",
-                label: "Blood unit management",
-
-              } */
-            ]
+            icon: Droplet,
+            submenus: []
           },
           {
             href: "/app/h/donor-management",
             label: "Donor Management",
-            icon: BookHeart,
-            submenus: [
-              /* {
-                href: "/donate/urgent",
-                label: "List of registered donors"
-              },
-              {
-                href: "/donate/nearby",
-                label: "Donor eligibility & history",
-
-              },
-              {
-                href: "/donate/nearby",
-                label: "Recent donations",
-
-              } */
-            ]
-          },
-        /* {
-          href: "",
-          label: "Doctor & Staff Management",
-          icon: UserSearch,
-          submenus: [
-            {
-              href: "/donate/urgent",
-              label: "Assigned doctors & specialists"
-            },
-            {
-              href: "/donate/nearby",
-              label: "Contact details & schedules",
-              
-            },
-            {
-              href: "/donate/nearby",
-              label: "Duty rosters",
-            }
-          ]
-        } */,
-          {
-            href: "/app/h/emergency-alerts",
-            label: "Emergency Alerts",
-            icon: AlertCircle,
-            submenus: [/*
-              {
-                href: "/donate/urgent",
-                label: "Critical low-stock alerts"
-              },
-              {
-                href: "/donate/nearby",
-                label: "Urgent blood requests",
-
-              },
-              {
-                href: "/donate/nearby",
-                label: "Emergency contact numbers",
-              } */
-            ]
+            icon: UserCheck,
+            submenus: []
           },
           {
             href: "/app/h/analytics",
             label: "Analytics",
-            icon: ChartArea,
-            submenus: [/*
-              {
-                href: "/not-found",
-                label: "Monthly blood usage statistics"
-              },
-              {
-                href: "/not-found",
-                label: "Donor & request trends",
-
-              },
-              {
-                href: "/not-found",
-                label: "Hospital efficiency metrics",
-              } */
-            ]
-          },
-          {
-            href: "/app/h/notifications",
-            label: "Notifications",
-            icon: BellRing
+            icon: BarChart3,
+            submenus: []
           },
         ]
       },
@@ -299,12 +182,7 @@ export function getMenuList(pathname: string, role: "guest" | "admin" | "removed
           {
             href: "/app/h/profile",
             label: "Profile",
-            icon: SquareUserRound
-          },
-          {
-            href: "/app/h/settings",
-            label: "Settings",
-            icon: Settings
+            icon: User
           },
         ]
       },
@@ -312,19 +190,10 @@ export function getMenuList(pathname: string, role: "guest" | "admin" | "removed
         groupLabel: "Help & Support",
         menus: [
           {
-            href: "/app/h/community",
-            label: "Community",
-            icon: Users
-          },
-          {
-            href: "/app/h/feedback",
-            label: "Feedback",
-            icon: MessageCircleReply
-          },
-          {
-            href: "/app/h/syncbot",
-            label: "Chat with Syncbot",
-            icon: BotMessageSquare
+            href: "/app/h/chat",
+            label: "K9 Buddy AI",
+            icon: Bot,
+            isSpecial: true
           }
         ]
       }
@@ -368,22 +237,6 @@ export function getMenuList(pathname: string, role: "guest" | "admin" | "removed
             label: "Vet Hospital",
             icon: Hospital
           },
-          // Emergency section hidden until ambulance network is finalized
-          /* {
-            href: "",
-            label: "Emergency",
-            icon: CircleAlert,
-            submenus: [
-              {
-                href: "/app/p/emergency/request",
-                label: "Emergency Request"
-              },
-              {
-                href: "/app/p/emergency/ambulance",
-                label: "Emergency Ambulance"
-              }
-            ]
-          }, */
           {
             href: "/app/p/notifications",
             label: "Notifications",
