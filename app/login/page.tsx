@@ -557,16 +557,18 @@ const items = [
   }
   ,
   {
-    title: "Continue as Veterinary Clinic",
+    title: "Continue as Veterinary Clinic Admin",
     description:
-      "Connect directly with dog donors to get the blood your patients need.",
+      "Manage a local clinic branch in the Ambattur network and sync data with the main hospital.",
     image: "/cs_hospital.webp",
+    comingSoon: true,
   },
   {
-    title: "Continue as Organisation/NGO",
+    title: "Continue as Veterinary Hospital",
     description:
-      "Organize donation drives & support those in urgent need.",
+      "Central CRM hub for hospital operations, managing multiple clinic branches and large-scale blood inventory.",
     image: "/cs_organisation.webp",
+    comingSoon: true,
   },
 ]
 
@@ -716,6 +718,7 @@ export default function LoginPage() {
                   image={item.image}
                   title={item.title}
                   description={item.description}
+                  comingSoon={item.comingSoon}
                   onClick={() => handleRoleSelect(item)}
                 />
               ))}

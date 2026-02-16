@@ -77,8 +77,18 @@ export default function RegisterPage() {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="patient">Patient</TabsTrigger>
           <TabsTrigger value="donor">Donor</TabsTrigger>
-          <TabsTrigger value="hospital">Hospital</TabsTrigger>
-          <TabsTrigger value="organisation">Organisation</TabsTrigger>
+          <TabsTrigger
+            value="hospital"
+            className="opacity-60 cursor-not-allowed pointer-events-none"
+          >
+            Clinic Admin (Soon)
+          </TabsTrigger>
+          <TabsTrigger
+            value="organisation"
+            className="opacity-60 cursor-not-allowed pointer-events-none"
+          >
+            Vet. Hospital (Soon)
+          </TabsTrigger>
         </TabsList>
 
         {/* Patient tab */}
@@ -152,11 +162,11 @@ export default function RegisterPage() {
 
         {/* hospital tab */}
         <TabsContent value="hospital">
-          <Card>
+          <Card className="opacity-60 cursor-not-allowed">
             <CardHeader>
-              <CardTitle>Hospital</CardTitle>
+              <CardTitle>Veterinary Hospital</CardTitle>
               <CardDescription>
-                Register as a hospital.
+                Central CRM hub for hospital operations, managing multiple clinic branches and large-scale blood inventory.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -177,11 +187,11 @@ export default function RegisterPage() {
 
         {/* organisation tab */}
         <TabsContent value="organisation">
-          <Card>
+          <Card className="opacity-60 cursor-not-allowed">
             <CardHeader>
-              <CardTitle>Organisation</CardTitle>
+              <CardTitle>Veterinary Clinic Admin</CardTitle>
               <CardDescription>
-                Register as an organisation.
+                Manage a local clinic branch in the Ambattur network and sync data with the main hospital.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
