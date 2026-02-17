@@ -1,0 +1,111 @@
+{
+    "indexes": [
+        {
+            "collectionGroup": "veterinary-donor-requests",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "status",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "veterinary-donor-requests",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "clinicId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "veterinary-donor-requests",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "linkedPatientId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "blood_requests",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "userId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "blood_requests",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "status",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "urgency",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "donors",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "d_city",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "d_bloodgroup",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "d_lastDonation",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "hospitals",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "h_city",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "isVerified",
+                    "order": "ASCENDING"
+                }
+            ]
+        }
+    ],
+    "fieldOverrides": []
+}

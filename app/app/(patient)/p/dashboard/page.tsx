@@ -65,20 +65,24 @@ export default function DashboardPage() {
       const q = query(
         requestsRef,
         where("linkedPatientId", "==", userId),
-        where("status", "==", "open"),
-        orderBy("createdAt", "desc")
+        where("status", "==", "open")
       );
 
       const snapshot = await getDocs(q);
 
       if (!snapshot.empty) {
-        const requestData = snapshot.docs[0].data();
+        // Sort client-side since we removed orderBy
+        const sortedDocs = snapshot.docs.sort((a, b) => {
+          return b.data().createdAt?.toMillis() - a.data().createdAt?.toMillis();
+        });
+
+        const requestData = sortedDocs[0].data();
 
         // Update UI with admin's blood request details
         setProfile((prev: any) => ({
           ...prev,
           hasActiveRequest: true,
-          requestId: snapshot.docs[0].id,
+          requestId: sortedDocs[0].id,
           adminRequestedBloodType: requestData.bloodTypeNeeded,
           adminRequestedQuantity: requestData.quantityNeeded,
           requestUrgency: requestData.isUrgent,

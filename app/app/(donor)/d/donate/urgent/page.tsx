@@ -96,12 +96,10 @@ export default function UrgentDonationsPage() {
     try {
       const requestsRef = collection(db, "veterinary-donor-requests");
 
-      // Query: Open requests, matching blood type, urgent priority
       const q = query(
         requestsRef,
         where("status", "==", "open"),
-        where("bloodTypeNeeded", "==", donorData.d_bloodgroup),
-        orderBy("createdAt", "desc")
+        where("bloodTypeNeeded", "==", donorData.d_bloodgroup)
       );
 
       const snapshot = await getDocs(q);
@@ -137,6 +135,13 @@ export default function UrgentDonationsPage() {
           isVerified: clinicData.isVerified || false, // Added
         });
       }
+
+      // Sort client-side (Newest First)
+      requests.sort((a, b) => {
+        const aTime = a.createdAt?.seconds || 0;
+        const bTime = b.createdAt?.seconds || 0;
+        return bTime - aTime;
+      });
 
       // Filter only urgent requests
       const urgent = requests.filter(r => r.isUrgent === "yes");

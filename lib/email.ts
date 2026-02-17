@@ -17,8 +17,8 @@ export async function sendContactEmail({
 }) {
   try {
     await resend.emails.send({
-      from: 'donorsync Contact <contact@donorsync.com>',
-      to: ['contact@donorsync.com'],
+      from: 'k9hope Contact <contact@k9hope.com>',
+      to: ['contact@k9hope.com'],
       subject: `New Contact Form: ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
@@ -33,16 +33,16 @@ export async function sendContactEmail({
 
     // Send confirmation email to user
     await resend.emails.send({
-      from: 'donorsync <noreply@donorsync.com>',
+      from: 'k9hope <noreply@k9hope.com>',
       to: [email],
-      subject: 'Thank you for contacting donorsync',
+      subject: 'Thank you for contacting k9hope',
       html: `
         <h2>Thank you for reaching out, ${name}!</h2>
         <p>We've received your message and will get back to you within 24 hours.</p>
         <p><strong>Your message:</strong></p>
         <p>${message.replace(/\n/g, '<br>')}</p>
         <br>
-        <p>Best regards,<br>The donorsync Team</p>
+        <p>Best regards,<br>The k9hope Team</p>
       `,
     });
   } catch (error) {

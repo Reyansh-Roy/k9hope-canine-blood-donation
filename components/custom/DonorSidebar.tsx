@@ -56,8 +56,8 @@ export default function DonorSidebar() {
                 <Link href="/app/d/dashboard">
                     <button
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${isActive("/app/d/dashboard")
-                                ? "bg-red-500 text-white"
-                                : "text-gray-700 hover:bg-gray-100"
+                            ? "bg-red-500 text-white"
+                            : "text-gray-700 hover:bg-gray-100"
                             }`}
                     >
                         <LayoutDashboard className="w-5 h-5" />
@@ -76,8 +76,8 @@ export default function DonorSidebar() {
                         <button
                             onClick={() => setIsDonateExpanded(!isDonateExpanded)}
                             className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg font-medium transition-all ${pathname.startsWith("/app/d/donate")
-                                    ? "bg-red-50 text-red-600"
-                                    : "text-gray-700 hover:bg-gray-100"
+                                ? "bg-red-50 text-red-600"
+                                : "text-gray-700 hover:bg-gray-100"
                                 }`}
                         >
                             <div className="flex items-center gap-3">
@@ -97,8 +97,8 @@ export default function DonorSidebar() {
                                 <Link href="/app/d/donate/urgent">
                                     <button
                                         className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-all ${isActive("/app/d/donate/urgent")
-                                                ? "bg-red-100 text-red-700"
-                                                : "text-gray-600 hover:bg-gray-50"
+                                            ? "bg-red-100 text-red-700"
+                                            : "text-gray-600 hover:bg-gray-50"
                                             }`}
                                     >
                                         -  Urgent
@@ -107,8 +107,8 @@ export default function DonorSidebar() {
                                 <Link href="/app/d/donate/nearby">
                                     <button
                                         className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-all ${isActive("/app/d/donate/nearby")
-                                                ? "bg-red-100 text-red-700"
-                                                : "text-gray-600 hover:bg-gray-50"
+                                            ? "bg-red-100 text-red-700"
+                                            : "text-gray-600 hover:bg-gray-50"
                                             }`}
                                     >
                                         -  Nearby Donations
@@ -122,8 +122,8 @@ export default function DonorSidebar() {
                     <Link href="/app/d/appointments">
                         <button
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${isActive("/app/d/appointments")
-                                    ? "bg-red-500 text-white"
-                                    : "text-gray-700 hover:bg-gray-100"
+                                ? "bg-red-500 text-white"
+                                : "text-gray-700 hover:bg-gray-100"
                                 }`}
                         >
                             <Calendar className="w-5 h-5" />
@@ -135,8 +135,8 @@ export default function DonorSidebar() {
                     <Link href="/app/d/donation-history">
                         <button
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${isActive("/app/d/donation-history")
-                                    ? "bg-red-500 text-white"
-                                    : "text-gray-700 hover:bg-gray-100"
+                                ? "bg-red-500 text-white"
+                                : "text-gray-700 hover:bg-gray-100"
                                 }`}
                         >
                             <History className="w-5 h-5" />
@@ -148,8 +148,8 @@ export default function DonorSidebar() {
                     <Link href="/app/d/notifications">
                         <button
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${isActive("/app/d/notifications")
-                                    ? "bg-red-500 text-white"
-                                    : "text-gray-700 hover:bg-gray-100"
+                                ? "bg-red-500 text-white"
+                                : "text-gray-700 hover:bg-gray-100"
                                 }`}
                         >
                             <Bell className="w-5 h-5" />
@@ -168,8 +168,8 @@ export default function DonorSidebar() {
                     <Link href="/app/d/profile">
                         <button
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${isActive("/app/d/profile")
-                                    ? "bg-red-500 text-white"
-                                    : "text-gray-700 hover:bg-gray-100"
+                                ? "bg-red-500 text-white"
+                                : "text-gray-700 hover:bg-gray-100"
                                 }`}
                         >
                             <User className="w-5 h-5" />
@@ -182,7 +182,7 @@ export default function DonorSidebar() {
             {/* Bottom Section */}
             <div className="p-4 border-t border-gray-200 space-y-2">
                 {/* K9 Buddy AI */}
-                <Link href="/app/d/syncbot">
+                <Link href="/app/d/k9buddy">
                     <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all border-2 border-gray-300">
                         <Bot className="w-5 h-5" />
                         K9 Buddy AI

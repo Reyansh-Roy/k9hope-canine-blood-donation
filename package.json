@@ -1,6 +1,38 @@
 {
-  "name": "K9HOPE",
-  "version": "0.1.0",
+  "name": "k9hope-canine-blood-network",
+  "version": "2.0.0",
+  "description": "India's First AI-Powered Veterinary Blood Donation Network for Dogs - Built by RIT Chennai CSE in partnership with Madras Veterinary College",
+  "keywords": [
+    "canine",
+    "veterinary",
+    "blood-bank",
+    "dogs",
+    "emergency",
+    "AI-triage",
+    "MVC",
+    "RIT-Chennai",
+    "DAHD-2025",
+    "DEA-blood-types",
+    "geospatial-matching",
+    "Tamil-Nadu"
+  ],
+  "author": {
+    "name": "RIT Chennai CSE Department",
+    "email": "k9hope@ritchennai.edu.in",
+    "url": "https://k9hope.in"
+  },
+  "contributors": [
+    "Vikram T (Student, RIT Chennai)",
+    "Prem Kumar (Student, RIT Chennai)",
+    "Ramkishore (Student, RIT Chennai)",
+    "Pandithurai O (Faculty Mentor, RIT Chennai)"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Reyansh-Roy/k9hope-canine-blood-donation"
+  },
+  "homepage": "https://k9hope.in",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev",

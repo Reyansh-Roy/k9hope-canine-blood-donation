@@ -117,8 +117,8 @@ export function getMenuList(pathname: string, role: "guest" | "admin" | "removed
             icon: MessageCircleReply
           },
           {
-            href: "/app/o/syncbot",
-            label: "Chat with Syncbot",
+            href: "/app/o/k9buddy",
+            label: "Chat with K9 Buddy AI",
             icon: BotMessageSquare
           }
         ]
@@ -190,7 +190,7 @@ export function getMenuList(pathname: string, role: "guest" | "admin" | "removed
         groupLabel: "Help & Support",
         menus: [
           {
-            href: "/app/h/chat",
+            href: "/app/h/k9buddy",
             label: "K9 Buddy AI",
             icon: Bot,
             isSpecial: true
@@ -248,7 +248,7 @@ export function getMenuList(pathname: string, role: "guest" | "admin" | "removed
         groupLabel: "Help & Support",
         menus: [
           {
-            href: "/app/p/syncbot",
+            href: "/app/p/k9buddy",
             label: "K9 Buddy AI",
             icon: Bot,
             isSpecial: true // Special styling for AI chatbot
@@ -321,7 +321,7 @@ export function getMenuList(pathname: string, role: "guest" | "admin" | "removed
         groupLabel: "",
         menus: [
           {
-            href: "/app/d/syncbot",
+            href: "/app/d/k9buddy",
             label: "K9 Buddy AI",
             icon: Bot,
             isSpecial: true

@@ -158,9 +158,7 @@ export default function DonorDashboard() {
       const q = query(
         requestsRef,
         where("status", "==", "open"),
-        where("bloodTypeNeeded", "==", donorData.d_bloodgroup),
-        orderBy("createdAt", "desc"),
-        limit(6)
+        where("bloodTypeNeeded", "==", donorData.d_bloodgroup)
       );
 
       const snapshot = await getDocs(q);
@@ -185,22 +183,34 @@ export default function DonorDashboard() {
           requestExpires: data.requestExpires,
           linkedPatientName: data.linkedPatientName,
           status: data.status,
+          // Store createdAt for sorting if available, though not in interface
+          // @ts-ignore
+          createdAt: data.createdAt
         });
       }
 
-      // Prioritize requests from same city
+      // Client-side sort (Newest first)
+      requests.sort((a: any, b: any) => {
+        return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+      });
+
+      // Prioritize requests from same city (existing logic)
       requests.sort((a, b) => {
         const aSameCity = a.clinicCity.toLowerCase() === donorData.d_city.toLowerCase() ? 1 : 0;
         const bSameCity = b.clinicCity.toLowerCase() === donorData.d_city.toLowerCase() ? 1 : 0;
         return bSameCity - aSameCity;
       });
 
-      setUrgentRequests(requests);
+      // Limit to 6
+      setUrgentRequests(requests.slice(0, 6));
+      return; // Return early since we set state directly logic is intertwined
     } catch (error) {
       console.error("Error fetching urgent requests:", error);
       setUrgentRequests([]);
     }
   }
+
+
 
   if (loading || isAuthLoading) {
     return (
